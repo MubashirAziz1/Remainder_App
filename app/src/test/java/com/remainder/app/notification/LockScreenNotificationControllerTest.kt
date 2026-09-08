@@ -3,7 +3,7 @@ package com.remainder.app.notification
 import android.app.Application
 import android.app.Notification
 import android.app.NotificationManager
-import com.remainder.app.MainActivity
+import com.remainder.app.LockScreenAlarmActivity
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
@@ -42,13 +42,13 @@ class LockScreenNotificationControllerTest {
     }
 
     @Test
-    fun showAttachesTapIntentToMainActivity() {
+    fun showAttachesTapIntentToLockScreenAlarmActivity() {
         controller.show()
 
         val contentIntent = postedNotification().contentIntent
         assertNotNull(contentIntent)
         val launched = shadowOf(contentIntent).savedIntent
-        assertEquals(MainActivity::class.java.name, launched.component?.className)
+        assertEquals(LockScreenAlarmActivity::class.java.name, launched.component?.className)
     }
 
     @Test

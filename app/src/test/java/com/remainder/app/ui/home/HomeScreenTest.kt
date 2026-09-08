@@ -40,4 +40,19 @@ class HomeScreenTest {
         composeRule.onNodeWithText("Open settings").performClick()
         assertTrue(opened)
     }
+
+    @Test
+    fun createAlarmActionInvokesCallback() {
+        var opened = false
+        composeRule.setContent {
+            RemainderTheme {
+                HomeScreen(
+                    onOpenSettings = {},
+                    onCreateAlarm = { opened = true }
+                )
+            }
+        }
+        composeRule.onNodeWithText("New alarm").performClick()
+        assertTrue(opened)
+    }
 }

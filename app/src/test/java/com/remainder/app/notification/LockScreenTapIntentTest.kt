@@ -1,7 +1,7 @@
 package com.remainder.app.notification
 
 import android.content.Intent
-import com.remainder.app.MainActivity
+import com.remainder.app.LockScreenAlarmActivity
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -15,9 +15,9 @@ import org.robolectric.annotation.Config
 class LockScreenTapIntentTest {
 
     @Test
-    fun targetsMainActivity() {
+    fun targetsLockScreenAlarmActivity() {
         val intent = LockScreenTapIntent.create(RuntimeEnvironment.getApplication())
-        assertEquals(MainActivity::class.java.name, intent.component?.className)
+        assertEquals(LockScreenAlarmActivity::class.java.name, intent.component?.className)
     }
 
     @Test

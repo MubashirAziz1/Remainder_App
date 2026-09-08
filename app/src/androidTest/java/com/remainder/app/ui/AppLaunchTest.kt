@@ -32,4 +32,26 @@ class AppLaunchTest {
         composeRule.onNodeWithText("Open settings").performClick()
         composeRule.onNodeWithText("Show lock-screen reminder").assertIsDisplayed()
     }
+
+    @Test
+    fun opensCreateAlarmFormFromHome() {
+        composeRule.onNodeWithText("New alarm").performClick()
+        composeRule.onNodeWithText("New alarm").assertIsDisplayed()
+        composeRule.onNodeWithText("Confirm").assertIsDisplayed()
+        composeRule.onNodeWithText("Cancel").assertIsDisplayed()
+    }
+
+    @Test
+    fun confirmWithoutTitleShowsError() {
+        composeRule.onNodeWithText("New alarm").performClick()
+        composeRule.onNodeWithText("Confirm").performClick()
+        composeRule.onNodeWithText("Title is required").assertIsDisplayed()
+    }
+
+    @Test
+    fun cancelReturnsToHome() {
+        composeRule.onNodeWithText("New alarm").performClick()
+        composeRule.onNodeWithText("Cancel").performClick()
+        composeRule.onNodeWithText("Open settings").assertIsDisplayed()
+    }
 }
