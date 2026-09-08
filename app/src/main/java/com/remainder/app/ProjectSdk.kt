@@ -1,7 +1,7 @@
 package com.remainder.app
 
 object ProjectSdk {
-    const val MIN = 26
-    const val TARGET = 36
-    const val COMPILE = 37
+    val MIN: Int = 27
+    val TARGET: Int = 36
+    val COMPILE: Int = 37
 }

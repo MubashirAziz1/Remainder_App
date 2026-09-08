@@ -1,12 +1,16 @@
 package com.remainder.app.ui.theme
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 
 @Composable
-fun RemainderTheme(content: @Composable () -> Unit) {
+fun RemainderTheme(
+    darkTheme: Boolean = isSystemInDarkTheme(),
+    content: @Composable () -> Unit
+) {
     MaterialTheme(
-        colorScheme = RemainderLightColorScheme,
+        colorScheme = if (darkTheme) RemainderDarkColorScheme else RemainderLightColorScheme,
         typography = RemainderTypography,
         content = content
     )

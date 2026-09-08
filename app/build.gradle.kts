@@ -4,17 +4,13 @@ plugins {
     jacoco
 }
 
-jacoco {
-    toolVersion = libs.versions.jacoco.get()
-}
-
 android {
     namespace = "com.remainder.app"
     compileSdk = 37
 
     defaultConfig {
         applicationId = "com.remainder.app"
-        minSdk = 26
+        minSdk = 27
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
@@ -76,27 +72,27 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
 }
 
-tasks.register<JacocoReport>("jacocoTestReport") {
-    dependsOn("testDebugUnitTest")
+tasks.register<JacocoReport>("jacocoLogicReport") {
+    dependsOn("compileDebugKotlin", "testDebugUnitTest")
+    val classOutput = layout.buildDirectory.dir("intermediates/built_in_kotlinc/debug/compileDebugKotlin/classes")
+    val execFile = layout.buildDirectory.file(
+        "outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec"
+    )
+    inputs.dir(classOutput)
+    inputs.file(execFile)
+    classDirectories.setFrom(
+        files(classOutput).asFileTree.matching {
+            exclude("**/ComposableSingletons*")
+            exclude("**/*ScreenKt*")
+            exclude("**/RemainderNavHostKt*")
+            exclude("**/ThemeKt*")
+            exclude("**/MainActivity*")
+        }
+    )
+    sourceDirectories.setFrom(files("src/main/java"))
+    executionData.setFrom(execFile)
     reports {
         xml.required.set(true)
         html.required.set(true)
-    }
-    val coverageDir = layout.buildDirectory.dir("coverage-results")
-    val classDir = layout.buildDirectory.dir("tmp/kotlin-classes/debug")
-    val sourceDir = layout.projectDirectory.dir("src/main/java")
-    classDirectories.setFrom(
-        files(classDir).asFileTree.matching {
-            exclude("**/R.class", "**/R$*.class", "**/BuildConfig.*")
-        }
-    )
-    sourceDirectories.setFrom(files(sourceDir))
-    executionData.setFrom(
-        fileTree(layout.buildDirectory) {
-            include("**/*.exec", "**/*.ec")
-        }
-    )
-    doFirst {
-        coverageDir.get().asFile.mkdirs()
     }
 }
