@@ -8,10 +8,10 @@ import com.remainder.app.R
 
 class LockScreenNotificationController(
     private val context: Context
-) {
+) : LockScreenNotifier {
     private val notificationManager = context.getSystemService(NotificationManager::class.java)
 
-    fun show() {
+    override fun show() {
         ensureChannel()
         val tapIntent = PendingIntent.getActivity(
             context,
@@ -33,11 +33,11 @@ class LockScreenNotificationController(
         notificationManager.notify(LockScreenNotificationSpec.NOTIFICATION_ID, notification)
     }
 
-    fun hide() {
+    override fun hide() {
         notificationManager.cancel(LockScreenNotificationSpec.NOTIFICATION_ID)
     }
 
-    fun ensureChannel() {
+    override fun ensureChannel() {
         LockScreenNotificationChannel.ensureCreated(notificationManager)
     }
 }

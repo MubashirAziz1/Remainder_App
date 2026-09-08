@@ -1,115 +1,142 @@
 package com.remainder.app.notification
 
-import android.app.Application
-import android.app.NotificationManager
-import android.content.Context
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
-import org.junit.Before
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
-import org.robolectric.RuntimeEnvironment
-import org.robolectric.annotation.Config
 
-@RunWith(RobolectricTestRunner::class)
-@Config(sdk = [34])
 class LockScreenNotificationCoordinatorTest {
-
-    private lateinit var context: Application
-    private lateinit var notificationManager: NotificationManager
-    private lateinit var preferences: LockScreenNotificationPreferences
-    private lateinit var controller: LockScreenNotificationController
-
-    @Before
-    fun setUp() {
-        context = RuntimeEnvironment.getApplication()
-        context.getSharedPreferences("remainder_notifications", Context.MODE_PRIVATE).edit().clear().commit()
-        notificationManager = context.getSystemService(NotificationManager::class.java)
-        preferences = LockScreenNotificationPreferences(context)
-        controller = LockScreenNotificationController(context)
-    }
 
     @Test
     fun enablingWithoutPermissionAsksAndDoesNotShow() {
-        val coordinator = coordinator(granted = false)
+        val notifications = FakeNotifier()
+        val preferences = FakeStore()
+        val coordinator = coordinator(preferences, granted = false, notifications)
 
         val result = coordinator.setEnabled(true)
 
         assertEquals(LockScreenEnableResult.NeedsPermission, result)
         assertFalse(preferences.isEnabled())
-        assertFalse(isShowing())
+        assertFalse(notifications.showing)
     }
 
     @Test
     fun enablingWithPermissionShowsAndPersists() {
-        val coordinator = coordinator(granted = true)
+        val notifications = FakeNotifier()
+        val preferences = FakeStore()
+        val coordinator = coordinator(preferences, granted = true, notifications)
 
         val result = coordinator.setEnabled(true)
 
         assertEquals(LockScreenEnableResult.Shown, result)
         assertTrue(preferences.isEnabled())
-        assertTrue(isShowing())
+        assertTrue(notifications.showing)
     }
 
     @Test
     fun disablingHidesAndPersists() {
-        val coordinator = coordinator(granted = true)
-        coordinator.setEnabled(true)
+        val notifications = FakeNotifier()
+        val preferences = FakeStore(enabled = true)
+        notifications.showing = true
+        val coordinator = coordinator(preferences, granted = true, notifications)
 
         val result = coordinator.setEnabled(false)
 
         assertEquals(LockScreenEnableResult.Hidden, result)
         assertFalse(preferences.isEnabled())
-        assertFalse(isShowing())
+        assertFalse(notifications.showing)
     }
 
     @Test
     fun syncShowsWhenEnabledAndGranted() {
-        preferences.setEnabled(true)
-        coordinator(granted = true).sync()
-        assertTrue(isShowing())
+        val notifications = FakeNotifier()
+        val preferences = FakeStore(enabled = true)
+        coordinator(preferences, granted = true, notifications).sync()
+        assertTrue(notifications.showing)
+        assertTrue(notifications.channelEnsured)
     }
 
     @Test
     fun syncHidesWhenEnabledButPermissionMissing() {
-        preferences.setEnabled(true)
-        coordinator(granted = false).sync()
-        assertFalse(isShowing())
+        val notifications = FakeNotifier()
+        notifications.showing = true
+        val preferences = FakeStore(enabled = true)
+        coordinator(preferences, granted = false, notifications).sync()
+        assertFalse(notifications.showing)
+        assertTrue(notifications.channelEnsured)
     }
 
     @Test
     fun syncHidesWhenDisabled() {
-        preferences.setEnabled(false)
-        coordinator(granted = true).sync()
-        assertFalse(isShowing())
+        val notifications = FakeNotifier()
+        notifications.showing = true
+        val preferences = FakeStore(enabled = false)
+        coordinator(preferences, granted = true, notifications).sync()
+        assertFalse(notifications.showing)
     }
 
     @Test
     fun permissionGrantedShowsAndPersists() {
-        val coordinator = coordinator(granted = true)
-        coordinator.onPermissionGranted()
+        val notifications = FakeNotifier()
+        val preferences = FakeStore()
+        coordinator(preferences, granted = true, notifications).onPermissionGranted()
         assertTrue(preferences.isEnabled())
-        assertTrue(isShowing())
+        assertTrue(notifications.showing)
     }
 
     @Test
     fun permissionDeniedHidesAndDisables() {
-        preferences.setEnabled(true)
-        controller.show()
-        val coordinator = coordinator(granted = false)
-        coordinator.onPermissionDenied()
+        val notifications = FakeNotifier()
+        notifications.showing = true
+        val preferences = FakeStore(enabled = true)
+        coordinator(preferences, granted = false, notifications).onPermissionDenied()
         assertFalse(preferences.isEnabled())
-        assertFalse(isShowing())
+        assertFalse(notifications.showing)
     }
 
-    private fun coordinator(granted: Boolean) = LockScreenNotificationCoordinator(
+    @Test
+    fun isUserEnabledReadsStore() {
+        val preferences = FakeStore(enabled = true)
+        assertTrue(coordinator(preferences, granted = true, FakeNotifier()).isUserEnabled())
+    }
+
+    @Test
+    fun isUserEnabledIsFalseWhenPermissionMissing() {
+        val preferences = FakeStore(enabled = true)
+        assertFalse(coordinator(preferences, granted = false, FakeNotifier()).isUserEnabled())
+    }
+
+    private fun coordinator(
+        preferences: LockScreenReminderStore,
+        granted: Boolean,
+        notifications: LockScreenNotifier
+    ) = LockScreenNotificationCoordinator(
         preferences = preferences,
         permission = NotificationPermissionChecker { granted },
-        notifications = controller
+        notifications = notifications
     )
 
-    private fun isShowing(): Boolean =
-        notificationManager.activeNotifications.any { it.id == LockScreenNotificationSpec.NOTIFICATION_ID }
+    private class FakeStore(private var enabled: Boolean = false) : LockScreenReminderStore {
+        override fun isEnabled(): Boolean = enabled
+        override fun setEnabled(enabled: Boolean) {
+            this.enabled = enabled
+        }
+    }
+
+    private class FakeNotifier : LockScreenNotifier {
+        var showing: Boolean = false
+        var channelEnsured: Boolean = false
+
+        override fun show() {
+            showing = true
+        }
+
+        override fun hide() {
+            showing = false
+        }
+
+        override fun ensureChannel() {
+            channelEnsured = true
+        }
+    }
 }

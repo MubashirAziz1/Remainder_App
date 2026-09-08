@@ -1,7 +1,5 @@
 package com.remainder.app.notification
 
-import android.content.Context
-
 fun interface NotificationPermissionChecker {
     fun isGranted(): Boolean
 }
@@ -13,11 +11,11 @@ sealed interface LockScreenEnableResult {
 }
 
 class LockScreenNotificationCoordinator(
-    private val preferences: LockScreenNotificationPreferences,
+    private val preferences: LockScreenReminderStore,
     private val permission: NotificationPermissionChecker,
-    private val notifications: LockScreenNotificationController
+    private val notifications: LockScreenNotifier
 ) {
-    fun isUserEnabled(): Boolean = preferences.isEnabled()
+    fun isUserEnabled(): Boolean = preferences.isEnabled() && permission.isGranted()
 
     fun setEnabled(enabled: Boolean): LockScreenEnableResult {
         if (!enabled) {
@@ -49,19 +47,6 @@ class LockScreenNotificationCoordinator(
             notifications.show()
         } else {
             notifications.hide()
-        }
-    }
-
-    companion object {
-        fun create(context: Context): LockScreenNotificationCoordinator {
-            val appContext = context.applicationContext
-            return LockScreenNotificationCoordinator(
-                preferences = LockScreenNotificationPreferences(appContext),
-                permission = NotificationPermissionChecker {
-                    NotificationPermissionPolicy.isGranted(appContext)
-                },
-                notifications = LockScreenNotificationController(appContext)
-            )
         }
     }
 }

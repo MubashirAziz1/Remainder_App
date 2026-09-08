@@ -29,13 +29,13 @@ class NotificationPermissionPolicyTest {
     @Test
     @Config(sdk = [27])
     fun preTiramisuIsGrantedWithoutAsking() {
-        assertTrue(NotificationPermissionPolicy.isGranted(RuntimeEnvironment.getApplication()))
+        assertTrue(NotificationPermissionReader.isGranted(RuntimeEnvironment.getApplication()))
     }
 
     @Test
     @Config(sdk = [33])
     fun android13IsDeniedByDefault() {
-        assertFalse(NotificationPermissionPolicy.isGranted(RuntimeEnvironment.getApplication()))
+        assertFalse(NotificationPermissionReader.isGranted(RuntimeEnvironment.getApplication()))
     }
 
     @Test
@@ -43,6 +43,6 @@ class NotificationPermissionPolicyTest {
     fun android13IsGrantedAfterPermission() {
         val context = RuntimeEnvironment.getApplication()
         shadowOf(context).grantPermissions(Manifest.permission.POST_NOTIFICATIONS)
-        assertTrue(NotificationPermissionPolicy.isGranted(context))
+        assertTrue(NotificationPermissionReader.isGranted(context))
     }
 }

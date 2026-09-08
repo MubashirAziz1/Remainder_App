@@ -10,16 +10,17 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import com.remainder.app.notification.LockScreenEnableResult
 import com.remainder.app.notification.LockScreenNotificationCoordinator
-import com.remainder.app.notification.NotificationPermissionPolicy
 import com.remainder.app.ui.navigation.RemainderNavHost
 
 @Composable
-fun RemainderApp(coordinator: LockScreenNotificationCoordinator) {
+fun RemainderApp(
+    coordinator: LockScreenNotificationCoordinator,
+    lifecycle: Lifecycle
+) {
     var enabled by remember { mutableStateOf(coordinator.isUserEnabled()) }
     val permissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -31,16 +32,15 @@ fun RemainderApp(coordinator: LockScreenNotificationCoordinator) {
         }
         enabled = coordinator.isUserEnabled()
     }
-    val lifecycleOwner = LocalLifecycleOwner.current
-    DisposableEffect(lifecycleOwner) {
+    DisposableEffect(lifecycle) {
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_RESUME) {
                 coordinator.sync()
                 enabled = coordinator.isUserEnabled()
             }
         }
-        lifecycleOwner.lifecycle.addObserver(observer)
-        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+        lifecycle.addObserver(observer)
+        onDispose { lifecycle.removeObserver(observer) }
     }
     RemainderNavHost(
         lockScreenReminderEnabled = enabled,

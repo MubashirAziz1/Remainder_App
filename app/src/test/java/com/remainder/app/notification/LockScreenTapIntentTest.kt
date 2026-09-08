@@ -25,5 +25,6 @@ class LockScreenTapIntentTest {
         val intent = LockScreenTapIntent.create(RuntimeEnvironment.getApplication())
         assertTrue(intent.flags and Intent.FLAG_ACTIVITY_SINGLE_TOP != 0)
         assertTrue(intent.flags and Intent.FLAG_ACTIVITY_CLEAR_TOP != 0)
+        assertTrue(intent.flags and Intent.FLAG_ACTIVITY_NEW_TASK != 0)
     }
 }
