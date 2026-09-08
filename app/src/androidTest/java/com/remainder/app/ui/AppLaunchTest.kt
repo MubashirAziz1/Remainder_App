@@ -26,4 +26,10 @@ class AppLaunchTest {
         composeRule.onNodeWithText("Back").performClick()
         composeRule.onNodeWithText("Remainder").assertIsDisplayed()
     }
+
+    @Test
+    fun settingsShowsLockScreenReminderToggle() {
+        composeRule.onNodeWithText("Open settings").performClick()
+        composeRule.onNodeWithText("Show lock-screen reminder").assertIsDisplayed()
+    }
 }
