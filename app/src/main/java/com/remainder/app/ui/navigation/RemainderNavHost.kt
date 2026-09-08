@@ -10,7 +10,9 @@ import com.remainder.app.ui.settings.SettingsScreen
 
 @Composable
 fun RemainderNavHost(
-    navController: NavHostController = rememberNavController()
+    navController: NavHostController = rememberNavController(),
+    lockScreenReminderEnabled: Boolean = false,
+    onLockScreenReminderChange: (Boolean) -> Unit = {}
 ) {
     NavHost(
         navController = navController,
@@ -25,7 +27,9 @@ fun RemainderNavHost(
         }
         composable(RemainderDestinations.Settings.route) {
             SettingsScreen(
-                onBack = { navController.popBackStack() }
+                onBack = { navController.popBackStack() },
+                lockScreenReminderEnabled = lockScreenReminderEnabled,
+                onLockScreenReminderChange = onLockScreenReminderChange
             )
         }
     }
