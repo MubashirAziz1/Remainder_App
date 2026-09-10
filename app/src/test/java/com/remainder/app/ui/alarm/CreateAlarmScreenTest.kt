@@ -5,6 +5,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTextInput
 import com.remainder.app.alarm.AlarmDraft
 import com.remainder.app.ui.theme.RemainderTheme
@@ -39,6 +40,23 @@ class CreateAlarmScreenTest {
         composeRule.onNodeWithText("Cancel").assertIsDisplayed()
         composeRule.onNodeWithText("AM").assertDoesNotExist()
         composeRule.onNodeWithText("PM").assertDoesNotExist()
+        composeRule.onNodeWithTag("alarm_hour_option_0").performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithTag("alarm_hour_option_23").performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithTag("alarm_minute_option_0").performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithTag("alarm_minute_option_59").performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithText("Title is required").assertDoesNotExist()
+    }
+
+    @Test
+    fun typingAfterErrorClearsValidationMessage() {
+        composeRule.setContent {
+            RemainderTheme {
+                CreateAlarmScreen(onConfirm = {}, onCancel = {})
+            }
+        }
+        composeRule.onNodeWithText("Confirm").performClick()
+        composeRule.onNodeWithText("Title is required").assertIsDisplayed()
+        composeRule.onNodeWithTag("alarm_title").performTextInput("Gym")
         composeRule.onNodeWithText("Title is required").assertDoesNotExist()
     }
 
@@ -100,10 +118,8 @@ class CreateAlarmScreenTest {
                 )
             }
         }
-        composeRule.onNodeWithTag("alarm_hour_picker").performClick()
-        composeRule.onNodeWithTag("alarm_hour_option_14").performClick()
-        composeRule.onNodeWithTag("alarm_minute_picker").performClick()
-        composeRule.onNodeWithTag("alarm_minute_option_45").performClick()
+        composeRule.onNodeWithTag("alarm_hour_option_14").performScrollTo().performClick()
+        composeRule.onNodeWithTag("alarm_minute_option_45").performScrollTo().performClick()
         composeRule.onNodeWithTag("alarm_title").performTextInput("Gym")
         composeRule.onNodeWithText("Confirm").performClick()
         assertEquals(AlarmDraft(hour = 14, minute = 45, title = "Gym"), draft)

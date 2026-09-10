@@ -35,4 +35,16 @@ class LockScreenAlarmManifestTest {
             activityBlock.contains("android:exported=\"false\"")
         )
     }
+
+    @Test
+    fun declaresClockAlarmPermissionAndQuery() {
+        assertTrue(
+            "AndroidManifest must request permission to set Clock alarms",
+            manifest.contains("android:name=\"com.android.alarm.permission.SET_ALARM\"")
+        )
+        assertTrue(
+            "AndroidManifest must query Clock alarm handlers on Android 11+",
+            manifest.contains("android.intent.action.SET_ALARM")
+        )
+    }
 }

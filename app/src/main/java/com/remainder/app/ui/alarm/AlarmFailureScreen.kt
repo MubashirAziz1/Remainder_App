@@ -1,21 +1,24 @@
-package com.remainder.app.ui.home
+package com.remainder.app.ui.alarm
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun HomeScreen(
-    onOpenSettings: () -> Unit,
-    onCreateAlarm: () -> Unit = {}
+fun AlarmFailureScreen(
+    errorMessage: String,
+    onRetry: () -> Unit,
+    onCancel: () -> Unit
 ) {
     Scaffold { padding ->
         Column(
@@ -26,18 +29,22 @@ fun HomeScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Text(
-                text = "Remainder",
+                text = "Alarm not created",
                 style = MaterialTheme.typography.displaySmall
             )
             Text(
-                text = "Named alarms without opening Clock.",
-                style = MaterialTheme.typography.bodyLarge
+                text = errorMessage,
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodyMedium
             )
-            Button(onClick = onCreateAlarm) {
-                Text("New alarm")
+            Button(
+                onClick = onRetry,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Retry")
             }
-            Button(onClick = onOpenSettings) {
-                Text("Open settings")
+            TextButton(onClick = onCancel) {
+                Text("Cancel")
             }
         }
     }
