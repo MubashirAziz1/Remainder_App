@@ -1,6 +1,7 @@
 package com.remainder.app
 
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.junit4.StateRestorationTester
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
@@ -147,6 +148,58 @@ class LockScreenAlarmActivityTest {
 
         composeRule.onNodeWithText("Cancel").performClick()
 
+        assertTrue(finished)
+    }
+
+    @Test
+    fun failureStateSurvivesRecreation() {
+        val restorationTester = StateRestorationTester(composeRule)
+        val scheduler = FlakyScheduler(failuresBeforeSuccess = 1)
+        restorationTester.setContent {
+            RemainderTheme {
+                LockScreenAlarmContent(
+                    alarmScheduler = scheduler,
+                    onFinish = {},
+                    clock = clock
+                )
+            }
+        }
+
+        composeRule.onNodeWithTag("alarm_title").performTextInput("Gym")
+        composeRule.onNodeWithText("Confirm").performClick()
+        composeRule.onNodeWithText("Alarm not created").assertIsDisplayed()
+
+        restorationTester.emulateSavedInstanceStateRestore()
+
+        composeRule.onNodeWithText("Alarm not created").assertIsDisplayed()
+        composeRule.onNodeWithText("Retry").performClick()
+        composeRule.onNodeWithText("Alarm set").assertIsDisplayed()
+    }
+
+    @Test
+    fun confirmationStateSurvivesRecreation() {
+        var finished = false
+        val restorationTester = StateRestorationTester(composeRule)
+        restorationTester.setContent {
+            RemainderTheme {
+                LockScreenAlarmContent(
+                    alarmScheduler = SuccessfulScheduler(),
+                    onFinish = { finished = true },
+                    clock = clock
+                )
+            }
+        }
+
+        composeRule.onNodeWithTag("alarm_title").performTextInput("Gym")
+        composeRule.onNodeWithText("Confirm").performClick()
+        composeRule.onNodeWithText("Alarm set").assertIsDisplayed()
+
+        restorationTester.emulateSavedInstanceStateRestore()
+
+        composeRule.onNodeWithText("Alarm set").assertIsDisplayed()
+        composeRule.onNodeWithText("07:00").assertIsDisplayed()
+        composeRule.onNodeWithText("Today").assertIsDisplayed()
+        composeRule.onNodeWithText("Done").performClick()
         assertTrue(finished)
     }
 
