@@ -89,6 +89,7 @@ tasks.register<JacocoReport>("jacocoLogicReport") {
             exclude("**/ThemeKt*")
             exclude("**/MainActivity*")
             exclude("**/LockScreenAlarmActivity*")
+            exclude("**/AlarmUiState*")
             exclude("**/CreateAlarmScreenKt*")
             exclude("**/TwentyFourHourPickersKt*")
             exclude("**/LockScreenNotificationController*")
@@ -96,6 +97,7 @@ tasks.register<JacocoReport>("jacocoLogicReport") {
             exclude("**/LockScreenNotificationPreferences*")
             exclude("**/LockScreenTapIntent*")
             exclude("**/NotificationPermissionReader*")
+            exclude("**/ContextAlarmLauncher*")
         }
     )
     sourceDirectories.setFrom(files("src/main/java"))

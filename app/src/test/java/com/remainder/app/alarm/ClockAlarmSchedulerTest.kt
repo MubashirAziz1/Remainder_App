@@ -1,7 +1,6 @@
 package com.remainder.app.alarm
 
 import android.content.ActivityNotFoundException
-import android.content.Intent
 import android.provider.AlarmClock
 import java.time.Clock
 import java.time.Instant
@@ -11,12 +10,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
-import org.robolectric.annotation.Config
 
-@RunWith(RobolectricTestRunner::class)
-@Config(sdk = [34])
 class ClockAlarmSchedulerTest {
 
     private val clock = Clock.fixed(
@@ -34,11 +28,11 @@ class ClockAlarmSchedulerTest {
         assertTrue(result is AlarmScheduleResult.Scheduled)
         val scheduled = result as AlarmScheduleResult.Scheduled
         assertEquals(LocalDate.of(2026, 9, 9), scheduled.occurrence.date)
-        assertEquals(AlarmClock.ACTION_SET_ALARM, launcher.launchedIntent?.action)
-        assertEquals("Medicine", launcher.launchedIntent?.getStringExtra(AlarmClock.EXTRA_MESSAGE))
-        assertTrue(
-            launcher.launchedIntent?.getBooleanExtra(AlarmClock.EXTRA_SKIP_UI, false) == true
-        )
+        assertEquals(AlarmClock.ACTION_SET_ALARM, launcher.launchedSpec?.action)
+        assertEquals("Medicine", launcher.launchedSpec?.message)
+        assertEquals(9, launcher.launchedSpec?.hour)
+        assertEquals(15, launcher.launchedSpec?.minute)
+        assertTrue(launcher.launchedSpec?.skipUi == true)
     }
 
     @Test
@@ -70,24 +64,56 @@ class ClockAlarmSchedulerTest {
             result
         )
     }
+
+    @Test
+    fun returnsFailureWhenClockLaunchThrowsSecurityException() {
+        val launcher = RecordingAlarmLauncher(
+            canHandle = true,
+            launchFailure = SecurityException("SET_ALARM revoked")
+        )
+        val scheduler = ClockAlarmScheduler(launcher = launcher, clock = clock)
+
+        val result = scheduler.schedule(AlarmDraft(hour = 9, minute = 15, title = "Medicine"))
+
+        assertEquals(
+            AlarmScheduleResult.Failed(AlarmScheduleError.ClockLaunchFailed),
+            result
+        )
+    }
+
+    @Test
+    fun returnsFailureWhenClockLaunchThrowsIllegalStateException() {
+        val launcher = RecordingAlarmLauncher(
+            canHandle = true,
+            launchFailure = IllegalStateException("Not allowed in background")
+        )
+        val scheduler = ClockAlarmScheduler(launcher = launcher, clock = clock)
+
+        val result = scheduler.schedule(AlarmDraft(hour = 9, minute = 15, title = "Medicine"))
+
+        assertEquals(
+            AlarmScheduleResult.Failed(AlarmScheduleError.ClockLaunchFailed),
+            result
+        )
+    }
 }
 
 private class RecordingAlarmLauncher(
     private val canHandle: Boolean,
     private val launchFailure: RuntimeException? = null
 ) : AlarmLauncher {
-    var launchedIntent: Intent? = null
+    var launchedSpec: AlarmIntentSpec? = null
         private set
     var launchCalled: Boolean = false
         private set
 
-    override fun canHandle(intent: Intent): Boolean = canHandle
+    override fun canHandle(spec: AlarmIntentSpec): Boolean = canHandle
 
-    override fun launch(intent: Intent) {
+    override fun launch(spec: AlarmIntentSpec) {
         launchCalled = true
         if (launchFailure != null) {
             throw launchFailure
         }
-        launchedIntent = intent
+        launchedSpec = spec
     }
 }

@@ -3,6 +3,7 @@ package com.remainder.app.alarm
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
+import android.provider.AlarmClock
 import java.time.Clock
 import java.time.LocalDateTime
 
@@ -21,17 +22,26 @@ enum class AlarmScheduleError(val userMessage: String) {
 }
 
 interface AlarmLauncher {
-    fun canHandle(intent: Intent): Boolean
-    fun launch(intent: Intent)
+    fun canHandle(spec: AlarmIntentSpec): Boolean
+    fun launch(spec: AlarmIntentSpec)
 }
 
 class ContextAlarmLauncher(private val context: Context) : AlarmLauncher {
-    override fun canHandle(intent: Intent): Boolean {
-        return intent.resolveActivity(context.packageManager) != null
+    override fun canHandle(spec: AlarmIntentSpec): Boolean {
+        return toIntent(spec).resolveActivity(context.packageManager) != null
     }
 
-    override fun launch(intent: Intent) {
-        context.startActivity(intent)
+    override fun launch(spec: AlarmIntentSpec) {
+        context.startActivity(toIntent(spec))
+    }
+
+    private fun toIntent(spec: AlarmIntentSpec): Intent {
+        return Intent(spec.action).apply {
+            putExtra(AlarmClock.EXTRA_HOUR, spec.hour)
+            putExtra(AlarmClock.EXTRA_MINUTES, spec.minute)
+            putExtra(AlarmClock.EXTRA_MESSAGE, spec.message)
+            putExtra(AlarmClock.EXTRA_SKIP_UI, spec.skipUi)
+        }
     }
 }
 
