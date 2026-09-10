@@ -7,18 +7,18 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import com.remainder.app.alarm.AlarmConfirmationFormatter
 import com.remainder.app.alarm.AlarmDraft
-import com.remainder.app.alarm.AlarmOccurrence
-import com.remainder.app.alarm.AlarmScheduleError
 import com.remainder.app.alarm.AlarmScheduleResult
 import com.remainder.app.alarm.AlarmScheduler
 import com.remainder.app.alarm.ClockAlarmScheduler
 import com.remainder.app.alarm.ContextAlarmLauncher
 import com.remainder.app.ui.alarm.AlarmConfirmationScreen
 import com.remainder.app.ui.alarm.AlarmFailureScreen
+import com.remainder.app.ui.alarm.AlarmUiState
+import com.remainder.app.ui.alarm.AlarmUiStateSaver
 import com.remainder.app.ui.alarm.CreateAlarmScreen
 import com.remainder.app.ui.theme.RemainderTheme
 import java.time.Clock
@@ -42,19 +42,15 @@ class LockScreenAlarmActivity : ComponentActivity() {
     }
 }
 
-internal sealed interface AlarmUiState {
-    data object Editing : AlarmUiState
-    data class Failed(val draft: AlarmDraft, val error: AlarmScheduleError) : AlarmUiState
-    data class Scheduled(val occurrence: AlarmOccurrence) : AlarmUiState
-}
-
 @Composable
 internal fun LockScreenAlarmContent(
     alarmScheduler: AlarmScheduler,
     onFinish: () -> Unit,
     clock: Clock = Clock.systemDefaultZone()
 ) {
-    var state by remember { mutableStateOf<AlarmUiState>(AlarmUiState.Editing) }
+    var state by rememberSaveable(stateSaver = AlarmUiStateSaver) {
+        mutableStateOf<AlarmUiState>(AlarmUiState.Editing)
+    }
 
     fun attemptSchedule(draft: AlarmDraft) {
         state = when (val result = alarmScheduler.schedule(draft)) {

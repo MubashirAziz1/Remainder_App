@@ -1,5 +1,6 @@
 package com.remainder.app.ui.alarm
 
+import androidx.compose.runtime.saveable.SaverScope
 import com.remainder.app.alarm.AlarmDraft
 import com.remainder.app.alarm.AlarmOccurrence
 import com.remainder.app.alarm.AlarmScheduleError
@@ -10,11 +11,15 @@ import org.junit.Test
 
 class AlarmUiStateSaverTest {
 
+    private val scope = SaverScope { true }
+
+    private fun save(state: AlarmUiState): List<Any?> {
+        return with(AlarmUiStateSaver) { scope.save(state) }
+    }
+
     @Test
     fun editingRoundTrips() {
-        val restored = AlarmUiStateSaver.restore(
-            AlarmUiStateSaver.save(AlarmUiState.Editing)
-        )
+        val restored = AlarmUiStateSaver.restore(save(AlarmUiState.Editing))
 
         assertEquals(AlarmUiState.Editing, restored)
     }
@@ -26,7 +31,7 @@ class AlarmUiStateSaverTest {
             error = AlarmScheduleError.ClockLaunchFailed
         )
 
-        val restored = AlarmUiStateSaver.restore(AlarmUiStateSaver.save(state))
+        val restored = AlarmUiStateSaver.restore(save(state))
 
         assertEquals(state, restored)
     }
@@ -42,7 +47,7 @@ class AlarmUiStateSaverTest {
             )
         )
 
-        val restored = AlarmUiStateSaver.restore(AlarmUiStateSaver.save(state))
+        val restored = AlarmUiStateSaver.restore(save(state))
 
         assertEquals(state, restored)
     }

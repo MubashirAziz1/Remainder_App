@@ -89,7 +89,6 @@ tasks.register<JacocoReport>("jacocoLogicReport") {
             exclude("**/ThemeKt*")
             exclude("**/MainActivity*")
             exclude("**/LockScreenAlarmActivity*")
-            exclude("**/AlarmUiState*")
             exclude("**/CreateAlarmScreenKt*")
             exclude("**/TwentyFourHourPickersKt*")
             exclude("**/LockScreenNotificationController*")
