@@ -97,6 +97,9 @@ tasks.register<JacocoReport>("jacocoLogicReport") {
             exclude("**/LockScreenTapIntent*")
             exclude("**/NotificationPermissionReader*")
             exclude("**/ContextAlarmLauncher*")
+            exclude("**/OnboardingScreenKt*")
+            exclude("**/ContextSystemSettingsLauncher*")
+            exclude("**/OnboardingPreferences*")
         }
     )
     sourceDirectories.setFrom(files("src/main/java"))

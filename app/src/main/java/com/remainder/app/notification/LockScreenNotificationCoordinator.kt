@@ -17,6 +17,8 @@ class LockScreenNotificationCoordinator(
 ) {
     fun isUserEnabled(): Boolean = preferences.isEnabled() && permission.isGranted()
 
+    fun hasPermission(): Boolean = permission.isGranted()
+
     fun setEnabled(enabled: Boolean): LockScreenEnableResult {
         if (!enabled) {
             preferences.setEnabled(false)

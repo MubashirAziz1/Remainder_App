@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun SettingsScreen(
     onBack: () -> Unit,
+    onOpenOnboarding: () -> Unit = {},
     lockScreenReminderEnabled: Boolean = false,
     onLockScreenReminderChange: (Boolean) -> Unit = {}
 ) {
@@ -54,6 +55,9 @@ fun SettingsScreen(
                     onCheckedChange = onLockScreenReminderChange,
                     modifier = Modifier.testTag("lock_screen_reminder_toggle")
                 )
+            }
+            Button(onClick = onOpenOnboarding) {
+                Text("Notification setup")
             }
             Button(onClick = onBack) {
                 Text("Back")

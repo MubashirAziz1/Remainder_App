@@ -1,5 +1,6 @@
 package com.remainder.app
 
+import android.Manifest
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -9,6 +10,8 @@ import com.remainder.app.notification.LockScreenNotificationCoordinator
 import com.remainder.app.notification.LockScreenNotificationPreferences
 import com.remainder.app.notification.NotificationPermissionChecker
 import com.remainder.app.notification.NotificationPermissionReader
+import com.remainder.app.onboarding.ContextSystemSettingsLauncher
+import com.remainder.app.onboarding.OnboardingPreferences
 import com.remainder.app.ui.RemainderApp
 import com.remainder.app.ui.theme.RemainderTheme
 
@@ -27,7 +30,16 @@ class MainActivity : ComponentActivity() {
         coordinator.sync()
         setContent {
             RemainderTheme {
-                RemainderApp(coordinator = coordinator, lifecycle = lifecycle)
+                RemainderApp(
+                    coordinator = coordinator,
+                    lifecycle = lifecycle,
+                    onboardingStore = OnboardingPreferences(appContext),
+                    settingsLauncher = ContextSystemSettingsLauncher(appContext),
+                    packageName = appContext.packageName,
+                    showNotificationRationale = {
+                        shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)
+                    }
+                )
             }
         }
     }
