@@ -106,6 +106,12 @@ class LockScreenNotificationCoordinatorTest {
         assertFalse(coordinator(preferences, granted = false, FakeNotifier()).isUserEnabled())
     }
 
+    @Test
+    fun hasPermissionReflectsChecker() {
+        assertTrue(coordinator(FakeStore(), granted = true, FakeNotifier()).hasPermission())
+        assertFalse(coordinator(FakeStore(), granted = false, FakeNotifier()).hasPermission())
+    }
+
     private fun coordinator(
         preferences: LockScreenReminderStore,
         granted: Boolean,
