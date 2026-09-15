@@ -184,6 +184,14 @@ class OnboardingScreenTest {
     }
 
     @Test
+    fun permanentDenialHidesRuntimeRequestButton() {
+        setContent(guidance = NotificationGuidance.OpenAppSettings)
+
+        composeRule.onNodeWithText("Allow notifications").assertDoesNotExist()
+        composeRule.onNodeWithText("Open app settings").assertIsDisplayed()
+    }
+
+    @Test
     fun permanentDenialShowsGuidanceAndOpensAppSettings() {
         val launched = mutableListOf<SystemSettingsIntentSpec>()
         setContent(

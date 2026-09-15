@@ -4,8 +4,12 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.remainder.app.ui.navigation.RemainderNavHost
 import com.remainder.app.ui.theme.RemainderTheme
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -64,6 +68,33 @@ class OnboardingNavigationTest {
 
         assertTrue(completed)
         composeRule.onNodeWithText("Remainder").assertIsDisplayed()
+    }
+
+    @Test
+    fun completingFirstRunOnboardingRemovesItFromBackStack() {
+        lateinit var navController: NavHostController
+        composeRule.setContent {
+            navController = rememberNavController()
+            RemainderTheme {
+                RemainderNavHost(
+                    navController = navController,
+                    startOnboarding = true,
+                    onboardingPackageName = "com.remainder.app"
+                )
+            }
+        }
+
+        composeRule.onNodeWithText("Next").performClick()
+        composeRule.onNodeWithText("Next").performClick()
+        composeRule.onNodeWithText("Done").performClick()
+
+        composeRule.runOnIdle {
+            assertEquals("home", navController.currentDestination?.route)
+            assertNull(
+                "Onboarding must not remain beneath Home after completion",
+                navController.previousBackStackEntry
+            )
+        }
     }
 
     @Test
