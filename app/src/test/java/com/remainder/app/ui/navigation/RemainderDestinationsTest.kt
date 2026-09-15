@@ -16,6 +16,11 @@ class RemainderDestinationsTest {
     }
 
     @Test
+    fun onboardingRouteIsOnboarding() {
+        assertEquals("onboarding", RemainderDestinations.Onboarding.route)
+    }
+
+    @Test
     fun startDestinationIsHome() {
         assertEquals("home", RemainderDestinations.startDestination)
     }
