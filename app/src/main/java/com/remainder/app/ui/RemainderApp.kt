@@ -9,6 +9,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -31,7 +32,7 @@ fun RemainderApp(
 ) {
     var enabled by remember { mutableStateOf(coordinator.isUserEnabled()) }
     var onboardingCompleted by remember { mutableStateOf(onboardingStore.isCompleted()) }
-    var denialObserved by remember { mutableStateOf(false) }
+    var denialObserved by rememberSaveable { mutableStateOf(false) }
     var permissionGranted by remember { mutableStateOf(coordinator.hasPermission()) }
     val permissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()

@@ -16,7 +16,7 @@ class OnboardingPreferences(context: Context) : OnboardingStore {
     override fun isCompleted(): Boolean = prefs.getBoolean(KEY, false)
 
     override fun markCompleted() {
-        prefs.edit().putBoolean(KEY, true).commit()
+        prefs.edit().putBoolean(KEY, true).apply()
     }
 
     private companion object {

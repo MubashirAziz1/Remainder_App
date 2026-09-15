@@ -16,6 +16,7 @@ class ContextSystemSettingsLauncher(private val context: Context) : SystemSettin
 
     private fun toIntent(spec: SystemSettingsIntentSpec): Intent {
         val intent = Intent(spec.action)
+            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         spec.packageName?.let { packageName ->
             intent.putExtra(Settings.EXTRA_APP_PACKAGE, packageName)
             intent.putExtra(Intent.EXTRA_PACKAGE_NAME, packageName)

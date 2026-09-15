@@ -66,7 +66,7 @@ fun RemainderNavHost(
                 onCompleted = {
                     onOnboardingCompleted()
                     navController.navigate(RemainderDestinations.Home.route) {
-                        popUpTo(RemainderDestinations.Home.route) { inclusive = true }
+                        popUpTo(RemainderDestinations.Onboarding.route) { inclusive = true }
                     }
                 }
             )

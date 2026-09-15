@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -42,6 +44,7 @@ fun OnboardingScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
+                .verticalScroll(rememberScrollState())
                 .padding(24.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
@@ -107,7 +110,7 @@ private fun NotificationStepActions(
     onRequestNotificationPermission: () -> Unit,
     onOpenSystemSettings: (SystemSettingsIntentSpec) -> Unit
 ) {
-    if (needsRuntimeNotificationRequest) {
+    if (needsRuntimeNotificationRequest && notificationGuidance != NotificationGuidance.OpenAppSettings) {
         Button(onClick = onRequestNotificationPermission) {
             Text("Allow notifications")
         }
