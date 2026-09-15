@@ -46,8 +46,12 @@ android {
 dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.datastore.preferences)
 
     val composeBom = platform(libs.androidx.compose.bom)
     implementation(composeBom)
@@ -65,6 +69,7 @@ dependencies {
 
     testImplementation(libs.junit)
     testImplementation(libs.robolectric)
+    testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.androidx.ui.test.junit4)
 
     androidTestImplementation(libs.androidx.junit)
@@ -93,13 +98,12 @@ tasks.register<JacocoReport>("jacocoLogicReport") {
             exclude("**/TwentyFourHourPickersKt*")
             exclude("**/LockScreenNotificationController*")
             exclude("**/LockScreenNotificationChannel*")
-            exclude("**/LockScreenNotificationPreferences*")
+            exclude("**/RemainderPreferences*")
             exclude("**/LockScreenTapIntent*")
             exclude("**/NotificationPermissionReader*")
             exclude("**/ContextAlarmLauncher*")
             exclude("**/OnboardingScreenKt*")
             exclude("**/ContextSystemSettingsLauncher*")
-            exclude("**/OnboardingPreferences*")
         }
     )
     sourceDirectories.setFrom(files("src/main/java"))
